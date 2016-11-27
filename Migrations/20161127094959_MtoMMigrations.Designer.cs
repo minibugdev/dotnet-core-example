@@ -8,8 +8,8 @@ using UserService.Models;
 namespace UserService.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20161127083009_FirstMigrations")]
-    partial class FirstMigrations
+    [Migration("20161127094959_MtoMMigrations")]
+    partial class MtoMMigrations
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -23,18 +23,14 @@ namespace UserService.Migrations
 
                     b.Property<string>("Name");
 
-                    b.Property<string>("UserId");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Role");
                 });
 
             modelBuilder.Entity("UserService.Models.User", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
                     b.Property<string>("Email");
@@ -46,11 +42,30 @@ namespace UserService.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("UserService.Models.Role", b =>
+            modelBuilder.Entity("UserService.Models.UserRole", b =>
                 {
-                    b.HasOne("UserService.Models.User")
-                        .WithMany("Roles")
-                        .HasForeignKey("UserId");
+                    b.Property<int>("UserId");
+
+                    b.Property<int>("RoleId");
+
+                    b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("UserRole");
+                });
+
+            modelBuilder.Entity("UserService.Models.UserRole", b =>
+                {
+                    b.HasOne("UserService.Models.Role", "Role")
+                        .WithMany("UserRoles")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("UserService.Models.User", "User")
+                        .WithMany("UserRoles")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
         }
     }
